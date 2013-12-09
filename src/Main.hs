@@ -1,17 +1,22 @@
 {-# LANGUAGE NoOverloadedStrings, ScopedTypeVariables #-}
-
+import           Control.Applicative
+import           Data.Maybe
+import           Options.Applicative
 import           System.Directory
-import           System.Environment
 import           System.FilePath.Posix
 import           System.Process
 import           Text.Regex.PCRE
 
-git_clone :: String -> IO String
-git_clone repo = do
-  callProcess "git" ["clone", "--depth=1", "--quiet", repo, dir]
+type GitPath = String
+type GitBranch = String
+
+git_clone :: GitPath -> Maybe GitBranch -> IO String
+git_clone path maybe_branch = do
+  callProcess "git" ["clone", "--branch", branch, "--single-branch", "--depth=1", "--quiet", path, dir]
   return dir
  where
-  dir :: String = repo =~ "(?<=/).*(?=.git)"
+  branch = fromMaybe "master" maybe_branch
+  dir :: String = path =~ "(?<=/).*(?=.git)"
 
 try_get_sandbox_dir :: IO (Maybe FilePath)
 try_get_sandbox_dir = do
@@ -30,17 +35,27 @@ cd dir = do
 link_to_sandbox :: FilePath -> IO ()
 link_to_sandbox sandbox_dir = callProcess "cabal" ["sandbox", "init", "--sandbox", sandbox_dir]
 
-install :: IO ()
-install = callProcess "cabal" ["install"]
+data Configuration = Configuration { _git_path :: String, _branch :: Maybe String }
 
-main :: IO ()
-main = do
-  dir <- git_clone =<< head `fmap` getArgs
+opt_parser :: Parser Configuration
+opt_parser = Configuration
+  <$> argument str (metavar "REPO")
+  <*> optional (strOption (long "branch" <> short 'b'))
+
+install :: Configuration -> IO ()
+install (Configuration { _git_path = path, _branch = b }) = do
+  dir <- git_clone path b
   sandbox_dir <- try_get_sandbox_dir
   cd dir
   case sandbox_dir of
     Just dir' -> link_to_sandbox dir'
     Nothing   -> return ()
-  install
+  callProcess "cabal" ["install"]
   setCurrentDirectory . takeDirectory =<< getCurrentDirectory
   removeDirectoryRecursive dir
+
+main :: IO ()
+main = execParser opts >>= install
+  where opts = info (helper <*> opt_parser) $ fullDesc <>
+          progDesc "Install cabal package from git to cabal globally or in sandbox if it exists"
+
