@@ -1,28 +1,26 @@
-{-# LANGUAGE NoOverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NoOverloadedStrings, ScopedTypeVariables #-}
 
-import Control.Monad
-import System.Process
-import Text.Regex.PCRE
-import System.Directory
-import System.FilePath.Posix
-import System.Environment
+import           System.Directory
+import           System.Environment
+import           System.FilePath.Posix
+import           System.Process
+import           Text.Regex.PCRE
 
 git_clone :: String -> IO String
 git_clone repo = do
-  callProcess "git" ["clone", "--depth=100", "--quiet", repo, dir]
+  callProcess "git" ["clone", "--depth=1", "--quiet", repo, dir]
   return dir
-    where
-      dir :: String = repo =~ "(?<=/).*(?=.git)"
+ where
+  dir :: String = repo =~ "(?<=/).*(?=.git)"
 
 try_get_sandbox_dir :: IO (Maybe FilePath)
 try_get_sandbox_dir = do
   dir <- getCurrentDirectory
   let sandbox_dir = dir </> ".cabal-sandbox"
   exist <- doesDirectoryExist sandbox_dir
-  if exist
-    then return $ Just sandbox_dir
-    else return Nothing
+  return $ if exist
+    then Just sandbox_dir
+    else Nothing
 
 cd :: String -> IO ()
 cd dir = do
@@ -35,7 +33,6 @@ link_to_sandbox sandbox_dir = callProcess "cabal" ["sandbox", "init", "--sandbox
 install :: IO ()
 install = callProcess "cabal" ["install"]
 
-
 main :: IO ()
 main = do
   dir <- git_clone =<< head `fmap` getArgs
@@ -43,7 +40,7 @@ main = do
   cd dir
   case sandbox_dir of
     Just dir' -> link_to_sandbox dir'
-    Nothing -> return ()
+    Nothing   -> return ()
   install
   setCurrentDirectory . takeDirectory =<< getCurrentDirectory
   removeDirectoryRecursive dir
