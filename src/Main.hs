@@ -10,7 +10,7 @@ import System.Environment
 
 git_clone :: String -> IO String
 git_clone repo = do
-  callProcess "git" ["clone", repo, dir]
+  callProcess "git" ["clone", "--depth=100", "--quiet", repo, dir]
   return dir
     where
       dir :: String = repo =~ "(?<=/).*(?=.git)"
