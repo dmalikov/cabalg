@@ -11,7 +11,7 @@ cabal-version:       >=1.10
 executable cabalg
   main-is:             Main.hs
   hs-source-dirs:      src
-  other-modules:       Git
+  other-modules:       Git, Sandbox
 
   build-depends:       base                 >= 4.6,
                        process              >= 1.2,
