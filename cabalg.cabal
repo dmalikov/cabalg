@@ -1,6 +1,6 @@
 name:                cabalg
-version:             0.0.0.0
-synopsis:            alias for cabal install from given git repo in temporary directory
+version:             0.1.0
+synopsis:            alias for cabal install from given git repo
 license:             MIT
 license-file:        LICENSE
 author:              Dmitry Malikov
@@ -13,7 +13,7 @@ executable cabalg
   hs-source-dirs:      src
   other-modules:       Git, Sandbox
 
-  build-depends:       base                 >= 4.6,
+  build-depends:       base                 >= 4.6 && < 5,
                        process              >= 1.2,
                        directory            >= 1.2,
                        filepath             >= 1.3,
