@@ -10,8 +10,9 @@ import           Sandbox
 
 main :: IO ()
 main = execParser opts >>= install
-  where opts = info (helper <*> opt_parser) $ fullDesc <>
-          progDesc "Install cabal package from git to cabal globally or in sandbox if it exists"
+  where
+    opts = info (helper <*> opt_parser) $
+             fullDesc <> progDesc "Install cabal package from git to cabal globally or in sandbox if it exists"
 
 
 data Configuration = Configuration { _git_url :: String, _branch :: Maybe String }
