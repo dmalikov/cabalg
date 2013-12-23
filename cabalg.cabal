@@ -36,7 +36,7 @@ executable cabalg
   other-modules: Git, Sandbox
 
   build-depends:
-      base >= 4.6 && < 5
+      base >= 4 && < 5
     , process >= 1.2
     , directory >= 1.2
     , filepath >= 1.3
