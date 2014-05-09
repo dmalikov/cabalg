@@ -1,37 +1,38 @@
-{-# LANGUAGE NoOverloadedStrings #-}
-import           Options.Applicative
-import           System.Directory    (getCurrentDirectory, getTemporaryDirectory, setCurrentDirectory)
-import           System.IO.Temp      (withTempDirectory)
-import           System.Process      (callProcess)
+{-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
+import           Control.Applicative
+import           Control.Arrow        (second)
+import           Data.List.Split      (splitOn)
+import           Data.Maybe           (catMaybes, fromMaybe, listToMaybe)
+import           System.Directory     (getCurrentDirectory)
+import           System.Environment
+import           System.FilePath.Find
+import           System.IO.Temp       (createTempDirectory)
+import           System.Process       (callProcess)
 
 import           Git
-import           Sandbox
 
 
 main :: IO ()
-main = execParser opts >>= install
-  where
-    opts = info (helper <*> opt_parser) $
-             fullDesc <> progDesc "Install cabal package from git to cabal globally or in sandbox if it exists"
+main = do
+  (repos, args) <- reposAndArgs <$> getArgs
+  cabalFiles :: [Maybe FilePath] <- mapM fetch repos
+  cabalInstall (catMaybes cabalFiles) args
 
 
-data Configuration = Configuration { _git_url :: String, _branch :: Maybe String }
+reposAndArgs :: [String] -> ([String], Maybe String)
+reposAndArgs = second flags . span (/= "--")
+ where
+  flags [] = Nothing
+  flags ["--"] = Nothing
+  flags (_:xs) = Just $ unwords xs
 
-install :: Configuration -> IO ()
-install (Configuration { _git_url = url, _branch = branch }) = do
-  back <- getCurrentDirectory
-  temp_dir <- getTemporaryDirectory
-  withTempDirectory temp_dir "cabalg_X" $ \dir -> do
-    clone url branch dir
-    sandbox_dir <- try_get_sandbox_dir back
-    setCurrentDirectory dir
-    case sandbox_dir of
-      Just dir' -> link_to_sandbox dir'
-      Nothing   -> return ()
-    callProcess "cabal" ["install"]
-  setCurrentDirectory back
+fetch :: String -> IO (Maybe FilePath)
+fetch url = do
+  current_dir <- getCurrentDirectory
+  cabal_dir <- createTempDirectory current_dir ("cabalg_" ++ last (splitOn "/" url) ++ "X")
+  clone url Nothing cabal_dir
+  listToMaybe <$> find always (extension ==? ".cabal") cabal_dir
 
-opt_parser :: Parser Configuration
-opt_parser = Configuration
-  <$> argument str (metavar "URL")
-  <*> optional (strOption (long "branch" <> short 'b'))
+cabalInstall :: [String] -> Maybe String -> IO ()
+cabalInstall cabalFiles args = callProcess "cabal" $ "install" : cabalFiles ++ words (fromMaybe "" args)
+
