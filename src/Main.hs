@@ -1,13 +1,15 @@
 {-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
 import           Control.Applicative
 import           Control.Arrow        (second)
+import           Control.Monad
 import           Data.List.Split      (splitOn)
 import           Data.Maybe           (catMaybes, fromMaybe, listToMaybe)
-import           System.Directory     (getCurrentDirectory)
+import           System.Directory     (createDirectory, getCurrentDirectory)
 import           System.Environment
+import           System.FilePath
 import           System.FilePath.Find
-import           System.IO.Temp       (createTempDirectory)
 import           System.Process       (callProcess)
+import           System.Random
 
 import           Git
 
@@ -28,14 +30,18 @@ reposAndArgs = second flags . span (/= "--")
 
 fetch :: String -> IO (Maybe FilePath)
 fetch urlAndMaybeRevision = do
-  current_dir <- getCurrentDirectory
-  let maybeRevision = listToMaybe . tail . splitOn "@" $ urlAndMaybeRevision
-      url = head $ splitOn "@" urlAndMaybeRevision
-  cabal_dir <- createTempDirectory current_dir ("cabalg_" ++ last (splitOn "/" url) ++ "X")
+  currentDir <- getCurrentDirectory
+  cabalDir <- (currentDir </>) . addName <$> genstr
+  createDirectory cabalDir
   case maybeRevision of
-    Just revision -> cloneRevision url revision cabal_dir
-    Nothing -> clone url cabal_dir
-  listToMaybe <$> find always (extension ==? ".cabal") cabal_dir
+    Just revision -> cloneRevision url revision cabalDir
+    Nothing -> clone url cabalDir
+  listToMaybe <$> find always (extension ==? ".cabal") cabalDir
+    where
+      maybeRevision = listToMaybe . tail . splitOn "@" $ urlAndMaybeRevision
+      url = head $ splitOn "@" urlAndMaybeRevision
+      genstr = liftM (take 10 . randomRs ('a','z')) newStdGen
+      addName = (("cabalg_" ++ last (splitOn "/" url)) ++) . ('_' :)
 
 cabalInstall :: [String] -> Maybe String -> IO ()
 cabalInstall cabalFiles args = callProcess "cabal" $ "install" : cabalFiles ++ words (fromMaybe "" args)
