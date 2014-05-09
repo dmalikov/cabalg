@@ -27,10 +27,14 @@ reposAndArgs = second flags . span (/= "--")
   flags (_:xs) = Just $ unwords xs
 
 fetch :: String -> IO (Maybe FilePath)
-fetch url = do
+fetch urlAndMaybeRevision = do
   current_dir <- getCurrentDirectory
+  let maybeRevision = listToMaybe . tail . splitOn "@" $ urlAndMaybeRevision
+      url = head $ splitOn "@" urlAndMaybeRevision
   cabal_dir <- createTempDirectory current_dir ("cabalg_" ++ last (splitOn "/" url) ++ "X")
-  clone url Nothing cabal_dir
+  case maybeRevision of
+    Just revision -> cloneRevision url revision cabal_dir
+    Nothing -> clone url cabal_dir
   listToMaybe <$> find always (extension ==? ".cabal") cabal_dir
 
 cabalInstall :: [String] -> Maybe String -> IO ()

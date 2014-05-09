@@ -6,20 +6,29 @@
 I.e.
 
 ```
-$> cabalg git://github.com/biegunka/biegunka.git --branch=develop
+$> cabalg https://github.com/biegunka/biegunka
 ```
 
 is just a shorthand for
 
 ```
-$> create-dir /temp/directory
-$> git clone --branch develop --single-branch --depth=1 --quiet git://github.com/biegunka/biegunka.git /temp/directory
-$> change-dir /temp/directory
-$> cabal install
-$> change-dir-back
-$> remove-dir /temp/directory
+$> mktemp
+$> git clone --single-branch --depth=1 --quiet https://github.com/biegunka/biegunka <tempdirname>
+$> cabal install <tempdirname>/<cabalfilename>
 ```
 
-If current directory is cabal-sandbox'ed, `cabalg` will attach the given repo to it.
+It also supports arbitrary git revisions mentioning like
+```
+$> cabalg https://github.com/biegunka/biegunka@beefboa
+```
 
-Also notice, that `--single-branch` flag comes with [git-1.7.10](https://lkml.org/lkml/2012/3/28/418) and later, so you probably want to have it.
+Necessary arguments could be passed to `cabal install` with `--` delimiter like
+
+```
+$> cabalg <repo1> ... <repoN> [-- <cabal-install args>]
+
+```
+
+Please notice, that `--single-branch` flag comes with [git-1.7.10](https://lkml.org/lkml/2012/3/28/418) and later, so you probably want to have it.
+
+It's supposed to be Windows-compatible.

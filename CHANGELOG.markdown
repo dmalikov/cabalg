@@ -11,6 +11,8 @@
 
   * Remove `--branch <branch_name>` flag
 
+  * Add syntax to mentioning revisions like `https://<repourl>@<revision>`
+
 0.1.2
 =====
   Initial version introduced:

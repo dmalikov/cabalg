@@ -1,19 +1,28 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Git where
 
-import           Data.Maybe      (fromMaybe)
+import           System.FilePath
 import           System.Process  (callProcess)
 
--- | git clone
+-- | git clone "master" branch
 clone :: String       -- | url
-      -> Maybe String -- | branch name
-      -> FilePath     -- | directory where repository will be clone to
+      -> FilePath     -- | directory where repository will be cloned to
       -> IO ()
-clone url maybe_branch dir =
-  callProcess "git" ["clone"
-    , "--branch", fromMaybe "master" maybe_branch
+clone url dir =
+  callProcess "git"
+    [ "clone"
+    , "--branch", "master"
     , "--single-branch"
     , "--depth=1"
     , "--quiet"
     , url
     , dir]
+
+-- | git clone and checkout in particular revision (could be much slower than 'clone')
+cloneRevision :: String   -- | url
+              -> String   -- | revision
+              -> FilePath -- | directory where repository will be cloned to
+              -> IO ()
+cloneRevision url revision dir = do
+  callProcess "git" [ "clone", url, dir ]
+  callProcess "git" [ "--git-dir", dir </> ".git", "checkout", revision, "--quiet" ]
