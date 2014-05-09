@@ -1,3 +1,8 @@
+0.2.1
+=====
+
+  * Get rid of `temporary` dependency
+
 0.2.0
 =====
 
