@@ -26,7 +26,6 @@ Necessary arguments could be passed to `cabal install` with `--` delimiter like
 
 ```
 $> cabalg <repo1> ... <repoN> [-- <cabal-install args>]
-
 ```
 
 Please notice, that `--single-branch` flag comes with [git-1.7.10](https://lkml.org/lkml/2012/3/28/418) and later, so you probably want to have it.
