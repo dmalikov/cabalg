@@ -1,3 +1,8 @@
+0.2.2
+=====
+
+  * Select `*.cabal` files found only with depth 1
+
 0.2.1
 =====
 

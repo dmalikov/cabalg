@@ -36,7 +36,7 @@ fetch urlAndMaybeRevision = do
   case maybeRevision of
     Just revision -> cloneRevision url revision cabalDir
     Nothing -> clone url cabalDir
-  listToMaybe <$> find always (extension ==? ".cabal") cabalDir
+  listToMaybe <$> find always (extension ==? ".cabal" &&? depth ==? 1) cabalDir
     where
       maybeRevision = listToMaybe . tail . splitOn "@" $ urlAndMaybeRevision
       url = head $ splitOn "@" urlAndMaybeRevision
