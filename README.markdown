@@ -3,23 +3,23 @@
 
 `cabalg` is an alias for installing cabal package from git source repository.
 
-I.e.
+Nowadays maintainers are too lazy to upload new versions of packages on hackage as fast as you think they do. Thus to build your own package in travis depending on this non-uploaded one you need to fetch it from github repo and build them together. `.travis.yml` becomes too noisy.
 
+I.e. we have `biegunka` package which depends on `temporary` and `acid-state` packages not uploaded on hackage yet:
 ```
-$> cabalg https://github.com/biegunka/biegunka
+- git clone https://github.com/supki/temporary
+- git clone https://github.com/acid-state/acid-state
+- cabal install temporary/temporary.cabal acid-state/acid-state.cabal biegunka.cabal
 ```
 
-is just a shorthand for
-
+These routines could be rewritten with `cabalg` (btw `cabalg` is not available on travis worker by default, hence you need to install it manually):
 ```
-$> mktemp
-$> git clone --single-branch --depth=1 --quiet https://github.com/biegunka/biegunka <tempdirname>
-$> cabal install <tempdirname>/<cabalfilename>
+- cabalg https://github.com/supki/temporary https://github.com/acid-state/acid-state -- biegunka.cabal
 ```
 
 It also supports arbitrary git revisions mentioning like
 ```
-$> cabalg https://github.com/biegunka/biegunka@beefboa
+$> cabalg https://github.com/biegunka/biegunka@f524f97
 ```
 
 Necessary arguments could be passed to `cabal install` with `--` delimiter like

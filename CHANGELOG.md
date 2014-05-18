@@ -1,3 +1,9 @@
+0.2.3
+=====
+
+  * All non-base dependencies are dropped
+  * `7.2`, `7.4`, `7.6`, `7.8` are supported
+
 0.2.2
 =====
 
