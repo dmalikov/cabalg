@@ -1,15 +1,14 @@
-{-# LANGUAGE QuasiQuotes #-}
 module Main where
 
-import System.Command.QQ
+import System.Directory
+import System.Process
+
+import System.Directory.NonExistent
 
 main :: IO ()
 main = do
-  [sh_|
-    mkdir -p testdir
-    cd testdir
-    git clone https://github.com/dmalikov/dotfiles
-    cabalg https://github.com/biegunka/biegunka@develop -- dotfiles/biegunka/dotfiles.cabal
-    cd ../
-  |]
-
+  currentDir <- getCurrentDirectory
+  tmpDir <- createNonExistentDirectory currentDir "cabalgtest"
+  setCurrentDirectory tmpDir
+  callProcess "cabalg" ["https://github.com/dmalikov/dotfiles@master", "https://github.com/biegunka/biegunka@develop"]
+  setCurrentDirectory currentDir

@@ -9,6 +9,7 @@ import System.FilePath
 import System.Process
 
 import Git
+import System.Directory.NonExistent
 
 
 main :: IO ()
@@ -50,19 +51,6 @@ repoName = takeWhile (/= '@') . lastSplitOn '/'
             go acc (x:xs) | x == c = go [] xs
                           | otherwise = go (acc ++ [x]) xs
             go acc [] = acc
-
-createNonExistentDirectory :: FilePath -> String -> IO FilePath
-createNonExistentDirectory currentDir dirname = do
-  newDir <- generateNonExistentDirectory dirname Nothing
-  createDirectory newDir
-  return newDir
-    where
-      generateNonExistentDirectory :: FilePath -> Maybe Int -> IO FilePath
-      generateNonExistentDirectory d suffix = let fullDirName = currentDir </> d ++ maybe "" show suffix in do
-        exist <- doesDirectoryExist fullDirName
-        if exist
-          then generateNonExistentDirectory d $ return $ maybe 1 (+ 1) suffix
-          else return fullDirName
 
 findCabalFile :: FilePath -> IO (Maybe FilePath)
 findCabalFile path = ((path </>) `fmap`) `fmap` find (".cabal" `isSuffixOf`) `fmap` getDirectoryContents path

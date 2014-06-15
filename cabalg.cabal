@@ -39,10 +39,22 @@ description:
 executable cabalg
   main-is: Main.hs
   hs-source-dirs: src
-  other-modules: Git
+  other-modules: Git System.Directory.NonExistent
   ghc-options: -Wall
   default-language: Haskell2010
 
+  build-depends:
+      base >= 4 && < 5
+    , process
+    , directory
+    , filepath
+
+library
+  hs-source-dirs: src
+  exposed-modules: System.Directory.NonExistent
+  other-modules: Git
+  ghc-options: -Wall
+  default-language: Haskell2010
   build-depends:
       base >= 4 && < 5
     , process
@@ -60,5 +72,7 @@ test-suite test
   default-language: Haskell2010
   build-depends:
       base >= 4 && < 5
-    , command-qq
+    , cabalg
+    , directory
+    , process
 
