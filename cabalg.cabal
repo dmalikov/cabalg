@@ -34,7 +34,7 @@ description:
   .
   Please notice, that '--single-branch' flag  comes with git-1.7.10 (<https://lkml.org/lkml/2012/3/28/418>) and later, so you probably want to have it.
   .
-  It's supposed to be Windows-compatible.
+  It's supposed to be Windows-compatible (not sure about the tests)
 
 executable cabalg
   main-is: Main.hs
@@ -52,3 +52,13 @@ executable cabalg
 source-repository head
   type: git
   location: https://github.com/dmalikov/cabalg
+
+test-suite test
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: Test.hs
+  default-language: Haskell2010
+  build-depends:
+      base >= 4 && < 5
+    , command-qq
+
