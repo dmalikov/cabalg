@@ -1,5 +1,5 @@
 name: cabalg
-version: 0.2.3
+version: 0.2.4
 synopsis: alias for cabal install from given git repo
 license: MIT
 license-file: LICENSE

@@ -1,3 +1,10 @@
+0.2.4
+=====
+
+  * Bug fixed: internal `git checkout` producing redundant copy of git repository
+    https://github.com/dmalikov/cabalg/issues/3
+
+
 0.2.3
 =====
 
