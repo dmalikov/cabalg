@@ -1,7 +1,8 @@
 module Git where
 
 import Control.Monad
-import System.FilePath
+import System.Directory
+import System.FilePath()
 import System.Process
 
 -- | git clone "master" branch
@@ -17,12 +18,15 @@ clone url dir = void $ readProcess "git"
   , url
   , dir] []
 
--- | git clone and checkout in particular revision (could be much slower than 'clone')
+-- | git clone and checkout particular revision (could be much slower than 'clone')
 cloneRevision :: String   -- | url
               -> String   -- | revision
               -> FilePath -- | directory where repository will be cloned to
               -> IO ()
 cloneRevision url revision dir = do
   void $ readProcess "git" [ "clone", url, dir ] []
-  void $ readProcess "git" [ "--git-dir", dir </> ".git", "checkout", revision, "--force", "--quiet" ] []
+  currentDir <- getCurrentDirectory
+  setCurrentDirectory dir
+  void $ readProcess "git" [ "checkout", revision, "--force", "--quiet" ] []
+  setCurrentDirectory currentDir
 
