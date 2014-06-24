@@ -1,3 +1,8 @@
+0.2.5
+=====
+
+  * Print cabal logs to the output
+
 0.2.4
 =====
 
