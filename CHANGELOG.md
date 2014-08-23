@@ -1,3 +1,8 @@
+0.2.6
+=====
+
+  * Display progress incrementally during install by allowing standard handles to inherit (@cpennington)
+
 0.2.5
 =====
 

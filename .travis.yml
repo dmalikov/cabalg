@@ -13,7 +13,7 @@ before_install:
 install:
     - cabal install
 
-after_result:
+after_install:
     - cabal test
 
 script: true
