@@ -1,5 +1,6 @@
 import Control.Applicative
 import Control.Arrow
+import Control.Monad
 import Data.List
 import Data.Maybe
 import System.Directory
@@ -40,7 +41,10 @@ fetch urlAndMaybeRevision = do
       url = takeWhile (/= '@') urlAndMaybeRevision
 
 cabalInstall :: [String] -> Maybe String -> IO ()
-cabalInstall cabalFiles args = putStrLn =<< readProcess "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args)) []
+cabalInstall cabalFiles args = do
+  let process = proc "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args))
+  (_, _, _, procHandle) <- createProcess process
+  void $ waitForProcess procHandle
 
 repoName :: String -> String
 repoName = takeWhile (/= '@') . lastSplitOn '/'
