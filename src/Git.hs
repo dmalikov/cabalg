@@ -1,18 +1,17 @@
 module Git where
 
-import System.Directory
-import System.FilePath()
-import System.Process
+import           System.Directory
+import           System.FilePath  ()
+import           System.Process
 
 -- | git clone "master" branch
 clone :: String       -- ^ url
       -> FilePath     -- ^ directory where repository will be cloned to
       -> IO ()
-clone url dir = putStrLn =<< readProcess "git"
+clone url dir = putStr =<< readProcess "git"
   [ "clone"
   , "--single-branch"
   , "--depth=1"
-  , "--quiet"
   , url
   , dir] []
 
@@ -22,9 +21,8 @@ cloneRevision :: String   -- ^ url
               -> FilePath -- ^ directory where repository will be cloned to
               -> IO ()
 cloneRevision url revision dir = do
-  putStrLn =<< readProcess "git" [ "clone", url, dir ] []
+  putStr =<< readProcess "git" [ "clone", url, dir ] []
   currentDir <- getCurrentDirectory
   setCurrentDirectory dir
-  putStrLn =<< readProcess "git" [ "checkout", revision, "--force", "--quiet" ] []
+  putStr =<< readProcess "git" [ "checkout", revision, "--force" ] []
   setCurrentDirectory currentDir
-
