@@ -10,7 +10,6 @@ clone :: String       -- ^ url
       -> IO ()
 clone url dir = putStrLn =<< readProcess "git"
   [ "clone"
-  , "--branch", "master"
   , "--single-branch"
   , "--depth=1"
   , "--quiet"
