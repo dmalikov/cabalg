@@ -19,7 +19,7 @@ description:
   .
   @$> mktemp
   $> git clone --single-branch --depth=1 --quiet https:\/\/github.com\/biegunka\/biegunka \<tempdirname\>
-  $> cabal install <tempdirname>/<cabalfilename>
+  $> cabal install \<tempdirname\>/\<cabalfilename\>
   @
   .
   It also supports arbitrary git revisions mentioning like

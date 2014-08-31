@@ -5,8 +5,8 @@ import System.FilePath()
 import System.Process
 
 -- | git clone "master" branch
-clone :: String       -- | url
-      -> FilePath     -- | directory where repository will be cloned to
+clone :: String       -- ^ url
+      -> FilePath     -- ^ directory where repository will be cloned to
       -> IO ()
 clone url dir = putStrLn =<< readProcess "git"
   [ "clone"
@@ -18,9 +18,9 @@ clone url dir = putStrLn =<< readProcess "git"
   , dir] []
 
 -- | git clone and checkout particular revision (could be much slower than 'clone')
-cloneRevision :: String   -- | url
-              -> String   -- | revision
-              -> FilePath -- | directory where repository will be cloned to
+cloneRevision :: String   -- ^ url
+              -> String   -- ^ revision
+              -> FilePath -- ^ directory where repository will be cloned to
               -> IO ()
 cloneRevision url revision dir = do
   putStrLn =<< readProcess "git" [ "clone", url, dir ] []
