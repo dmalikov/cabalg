@@ -1,30 +1,29 @@
 import Control.Applicative
-import Control.Arrow
 import Control.Monad
 import Data.List
 import Data.Maybe
+import Data.Version (showVersion)
+import Paths_cabalg (version)
 import System.Directory
 import System.Environment
 import System.FilePath
 import System.Process
 
+import Args
 import Git
 import System.Directory.NonExistent
 
 
 main :: IO ()
 main = do
-  (repos, args) <- reposAndArgs <$> getArgs
-  cabalFiles <- mapM fetch repos
-  cabalInstall (catMaybes cabalFiles) args
+  action <- fromArgs <$> getArgs
+  case action of
+    Help -> printHelp
+    Version -> putStrLn $ showVersion version
+    Install repos args -> do
+      cabalFiles <- mapM fetch repos
+      cabalInstall (catMaybes cabalFiles) args
 
-
-reposAndArgs :: [String] -> ([String], Maybe String)
-reposAndArgs = second flags . span (/= "--")
- where
-  flags [] = Nothing
-  flags ["--"] = Nothing
-  flags (_:xs) = Just $ unwords xs
 
 fetch :: String -> IO (Maybe FilePath)
 fetch urlAndMaybeRevision = do
@@ -40,11 +39,13 @@ fetch urlAndMaybeRevision = do
         _ -> Nothing
       url = takeWhile (/= '@') urlAndMaybeRevision
 
+
 cabalInstall :: [String] -> Maybe String -> IO ()
 cabalInstall cabalFiles args = do
   let process = proc "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args))
   (_, _, _, procHandle) <- createProcess process
   void $ waitForProcess procHandle
+
 
 repoName :: String -> String
 repoName = takeWhile (/= '@') . lastSplitOn '/'
@@ -54,6 +55,7 @@ repoName = takeWhile (/= '@') . lastSplitOn '/'
             go acc (x:xs) | x == c = go [] xs
                           | otherwise = go (acc ++ [x]) xs
             go acc [] = acc
+
 
 findCabalFile :: FilePath -> IO (Maybe FilePath)
 findCabalFile path = ((path </>) `fmap`) `fmap` find (".cabal" `isSuffixOf`) `fmap` getDirectoryContents path
