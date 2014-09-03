@@ -7,11 +7,9 @@ ghc:
  - 7.8
 
 before_install:
-    - ghc --version
     - cabal configure --enable-tests
 
 install:
-    - ghc --version
     - cabal build
     - cabal test
 

@@ -1,3 +1,12 @@
+0.2.7
+====
+
+  * Add `--help` and `--version` command line options
+
+  * Bug fixed: download the default upstream branch unless another one is explicitly provided
+    https://github.com/dmalikov/cabalg/issues/5
+
+
 0.2.6
 =====
 
