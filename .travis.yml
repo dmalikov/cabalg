@@ -7,13 +7,13 @@ ghc:
  - 7.8
 
 before_install:
+    - ghc --version
     - cabal configure --enable-tests
-    - cabal build
 
 install:
-    - cabal install
-
-after_install:
+    - ghc --version
+    - cabal build
     - cabal test
 
-script: true
+script:
+    - script/sdist-unpack-install.sh
