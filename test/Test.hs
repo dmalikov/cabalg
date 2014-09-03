@@ -13,7 +13,7 @@ main = do
   currentDir <- getCurrentDirectory
   exec <- findExecutableCabalg currentDir
   case exec of
-    Nothing -> error "unable to find cabalg executable"
+    Nothing -> error "unable to find cabalg executable in dist/build"
     Just cabalg -> do
       tmpDir <- createNonExistentDirectory currentDir "cabalgtest"
       setCurrentDirectory tmpDir
