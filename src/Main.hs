@@ -1,17 +1,21 @@
-import Control.Applicative
-import Control.Monad
-import Data.List
-import Data.Maybe
-import Data.Version (showVersion)
-import Paths_cabalg (version)
-import System.Directory
-import System.Environment
-import System.FilePath
-import System.Process
+import           Control.Applicative
+import           Control.Exception
+import           Control.Monad
+import           Data.Foldable
+import           Data.List
+import           Data.Maybe
+import           Data.Traversable
+import           Data.Version                 (showVersion)
+import           Paths_cabalg                 (version)
+import           System.Directory
+import           System.Environment
+import           System.FilePath
+import           System.IO.Error
+import           System.Process
 
-import Args
-import Git
-import System.Directory.NonExistent
+import           Args
+import           Git
+import           System.Directory.NonExistent
 
 
 main :: IO ()
@@ -21,14 +25,14 @@ main = do
     Help -> printHelp
     Version -> putStrLn $ showVersion version
     Install repos args -> do
-      cabalFiles <- mapM fetch repos
+      cabalFiles <- Data.Traversable.mapM fetch repos
       cabalInstall (catMaybes cabalFiles) args
 
 
 fetch :: String -> IO (Maybe FilePath)
 fetch urlAndMaybeRevision = do
-  currentDir <- getCurrentDirectory
-  newDir <- createNonExistentDirectory currentDir ("cabalg_" ++ repoName urlAndMaybeRevision)
+  dir <-  getWorkingDirectory
+  newDir <- createNonExistentDirectory dir ("cabalg_" ++ repoName urlAndMaybeRevision)
   case maybeRevision of
     Just revision -> cloneRevision url revision newDir
     Nothing -> clone url newDir
@@ -38,6 +42,19 @@ fetch urlAndMaybeRevision = do
         '@':x -> Just x
         _ -> Nothing
       url = takeWhile (/= '@') urlAndMaybeRevision
+
+
+getWorkingDirectory :: IO FilePath
+getWorkingDirectory =
+  liftM2 fromMaybe getCurrentDirectory . fmap Data.Foldable.msum . traverse lookupEnv' $ ["TMPDIR", "TEMP"]
+
+
+lookupEnv' :: String -> IO (Maybe String)
+lookupEnv' var = do
+  fmap eitherToMaybe . tryJust (guard . isDoesNotExistError) $ getEnv var
+ where
+  eitherToMaybe (Left  _) = Nothing
+  eitherToMaybe (Right x) = Just x
 
 
 cabalInstall :: [String] -> Maybe String -> IO ()
@@ -58,4 +75,4 @@ repoName = takeWhile (/= '@') . lastSplitOn '/'
 
 
 findCabalFile :: FilePath -> IO (Maybe FilePath)
-findCabalFile path = ((path </>) `fmap`) `fmap` find (".cabal" `isSuffixOf`) `fmap` getDirectoryContents path
+findCabalFile path = ((path </>) `fmap`) `fmap` Data.List.find (".cabal" `isSuffixOf`) `fmap` getDirectoryContents path

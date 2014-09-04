@@ -1,6 +1,6 @@
 module Args where
 
-import Control.Arrow (second)
+import           Control.Arrow (second)
 
 data Action
   = Help

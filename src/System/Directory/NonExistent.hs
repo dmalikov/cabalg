@@ -1,7 +1,7 @@
 module System.Directory.NonExistent where
 
-import System.FilePath
-import System.Directory
+import           System.Directory
+import           System.FilePath
 
 -- | create non existent directory appending a number to the end of the name
 createNonExistentDirectory :: FilePath -> String -> IO FilePath
