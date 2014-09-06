@@ -1,5 +1,10 @@
+0.2.8
+=====
+
+  * Respect `$TMPDIR` and `$TEMP` environment variables
+
 0.2.7
-====
+=====
 
   * Add `--help` and `--version` command line options
 
