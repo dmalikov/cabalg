@@ -67,14 +67,24 @@ cabalInstall cabalFiles args = do
     ExitFailure _ -> exitFailure
 
 
+-- | Compute the repository name from the URL
+--
+-- >>> repoName "https://github.com/dmalikov/cabalg"
+-- "cabalg"
+--
+-- >>> repoName "https://github.com/dmalikov/cabalg@master"
+-- "cabalg"
+--
+-- >>> repoName "git://github.com/dmalikov/cabalg"
+-- "cabalg"
 repoName :: String -> String
 repoName = takeWhile (/= '@') . lastSplitOn '/'
-  where lastSplitOn :: Eq a => a -> [a] -> [a]
-        lastSplitOn c = go []
-          where
-            go acc (x:xs) | x == c = go [] xs
-                          | otherwise = go (acc ++ [x]) xs
-            go acc [] = acc
+ where
+  lastSplitOn c = go
+   where
+    go xs = case break (== c) xs of
+      (ys , [])      -> ys
+      (_  , _ : xs') -> go xs'
 
 
 findCabalFile :: FilePath -> IO (Maybe FilePath)
