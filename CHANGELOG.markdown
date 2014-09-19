@@ -1,3 +1,8 @@
+0.2.9
+=====
+
+  * Exit with failure if cabal thrown non-success exit code
+
 0.2.8
 =====
 
