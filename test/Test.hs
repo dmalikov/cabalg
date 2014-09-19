@@ -1,21 +1,25 @@
 module Main where
 
-import           Control.Monad
 import           System.Directory
+import           System.Exit
 import           System.FilePath
 import           System.Process
 
-
 main :: IO ()
 main = do
+  throwsExitCode
+
+throwsExitCode :: IO ()
+throwsExitCode = do
   currentDir <- getCurrentDirectory
   exec <- findExecutableCabalg currentDir
   case exec of
     Nothing -> error "unable to find cabalg executable in dist/build"
     Just cabalg -> do
-      void $ readProcess cabalg ["https://github.com/dmalikov/dotfiles@master", "https://github.com/biegunka/biegunka@develop"] []
-      setCurrentDirectory currentDir
-
+      (exitCode, _, _) <- readProcessWithExitCode cabalg ["https://github.com/dmalikov/cabalg@broken"] []
+      case exitCode of
+        ExitSuccess -> error "cabalg masks cabal failure, proper exit code was not thrown"
+        _ -> setCurrentDirectory currentDir
 
 findExecutableCabalg :: FilePath -> IO (Maybe FilePath)
 findExecutableCabalg dir = do

@@ -9,6 +9,7 @@ import           Data.Version                 (showVersion)
 import           Paths_cabalg                 (version)
 import           System.Directory
 import           System.Environment
+import           System.Exit
 import           System.FilePath
 import           System.IO.Error
 import           System.Process
@@ -59,9 +60,11 @@ lookupEnv' var = do
 
 cabalInstall :: [String] -> Maybe String -> IO ()
 cabalInstall cabalFiles args = do
-  let process = proc "cabal" ("install" : cabalFiles ++ words (fromMaybe "" args))
-  (_, _, _, procHandle) <- createProcess process
-  void $ waitForProcess procHandle
+  (_, _, _, procHandle) <- createProcess $ proc "cabal" $ "install" : cabalFiles ++ words (fromMaybe "" args)
+  exitCode <- waitForProcess procHandle
+  case exitCode of
+    ExitSuccess -> return ()
+    ExitFailure _ -> exitFailure
 
 
 repoName :: String -> String
