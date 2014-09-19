@@ -1,4 +1,4 @@
-module Git where
+module Cabalg.Git where
 
 import           System.Directory
 import           System.FilePath  ()

@@ -5,8 +5,6 @@ import           Data.Foldable
 import           Data.List
 import           Data.Maybe
 import           Data.Traversable
-import           Data.Version                 (showVersion)
-import           Paths_cabalg                 (version)
 import           System.Directory
 import           System.Environment
 import           System.Exit
@@ -14,17 +12,18 @@ import           System.FilePath
 import           System.IO.Error
 import           System.Process
 
-import           Args
-import           Git
+import           Cabalg.Args
+import           Cabalg.Git
+import           Cabalg.Version
 import           System.Directory.NonExistent
 
 
 main :: IO ()
 main = do
-  action <- fromArgs <$> getArgs
+  action <- fromString <$> getArgs
   case action of
     Help -> printHelp
-    Version -> putStrLn $ showVersion version
+    Version -> putStrLn version
     Install repos args -> do
       cabalFiles <- Data.Traversable.mapM fetch repos
       cabalInstall (catMaybes cabalFiles) args
