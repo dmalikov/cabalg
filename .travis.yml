@@ -10,8 +10,7 @@ before_install:
     - cabal install --only-dependencies --enable-tests
 
 install:
-    - cabal build
-    - cabal test
+    - cabal install --enable-tests
 
 script:
-    - script/sdist-unpack-install.sh
+    - cabal sdist && cabal install --enable-tests dist/cabalg-*.tar.gz && cabalg --help
