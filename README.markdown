@@ -14,7 +14,7 @@ $ cabal install foo/foo.cabal bar/bar.cabal baz.cabal
 could be abbreviated by
 
 ```
-$ cabalg https://github.com/author/foo https://github.com/author/bar -- biegunka.cabal
+$ cabalg https://github.com/author/foo https://github.com/author/bar -- baz.cabal
 ```
 
 It also supports arbitrary git revisions mentioning like
